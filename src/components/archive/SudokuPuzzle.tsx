@@ -51,10 +51,10 @@ export const SudokuPuzzle = ({ onBack, onSolve }: SudokuPuzzleProps) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
       className="absolute inset-0 flex items-center justify-center backdrop-focus z-50"
     >
       <div className="relative bg-parchment/95 shadow-lifted rounded-sm p-8 max-w-sm w-full border border-brass/20">

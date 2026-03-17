@@ -6,6 +6,8 @@ import { DossierPanel } from "@/components/archive/DossierPanel";
 import { SudokuPuzzle } from "@/components/archive/SudokuPuzzle";
 import { Flatlandia } from "@/components/archive/Flatlandia";
 import { WhiteHole } from "@/components/archive/WhiteHole";
+import { AudioProvider } from "@/components/archive/AudioEngine";
+import { AudioToggle } from "@/components/archive/AudioToggle";
 import { dossiers } from "@/data/dossiers";
 
 export type AppView = "study" | "imac" | "sudoku" | "flatlandia" | "whitehole";
@@ -18,58 +20,62 @@ const Index = () => {
 
   const handleSudokuSolve = () => {
     setSudokuSolved(true);
-    setTimeout(() => setView("flatlandia"), 1200);
+    setTimeout(() => setView("flatlandia"), 1500);
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-background">
-      <AnimatePresence mode="wait">
-        {view === "study" && (
-          <StudyScene
-            key="study"
-            onIMacClick={() => setView("imac")}
-            onSudokuClick={() => setView("sudoku")}
-            onDossierClick={setActiveDossier}
-            sudokuSolved={sudokuSolved}
-            onFlatlandiaClick={() => setView("flatlandia")}
-          />
-        )}
+    <AudioProvider>
+      <div className="relative w-screen h-screen overflow-hidden bg-background">
+        <AnimatePresence mode="wait">
+          {view === "study" && (
+            <StudyScene
+              key="study"
+              onIMacClick={() => setView("imac")}
+              onSudokuClick={() => setView("sudoku")}
+              onDossierClick={setActiveDossier}
+              sudokuSolved={sudokuSolved}
+              onFlatlandiaClick={() => setView("flatlandia")}
+            />
+          )}
 
-        {view === "imac" && (
-          <IMacScreen key="imac" onBack={() => setView("study")} />
-        )}
+          {view === "imac" && (
+            <IMacScreen key="imac" onBack={() => setView("study")} />
+          )}
 
-        {view === "sudoku" && (
-          <SudokuPuzzle
-            key="sudoku"
-            onBack={() => setView("study")}
-            onSolve={handleSudokuSolve}
-          />
-        )}
+          {view === "sudoku" && (
+            <SudokuPuzzle
+              key="sudoku"
+              onBack={() => setView("study")}
+              onSolve={handleSudokuSolve}
+            />
+          )}
 
-        {view === "flatlandia" && (
-          <Flatlandia
-            key="flatlandia"
-            onBack={() => setView("study")}
-            onNext={() => setView("whitehole")}
-          />
-        )}
+          {view === "flatlandia" && (
+            <Flatlandia
+              key="flatlandia"
+              onBack={() => setView("study")}
+              onNext={() => setView("whitehole")}
+            />
+          )}
 
-        {view === "whitehole" && (
-          <WhiteHole key="whitehole" onBack={() => setView("study")} />
-        )}
-      </AnimatePresence>
+          {view === "whitehole" && (
+            <WhiteHole key="whitehole" onBack={() => setView("study")} />
+          )}
+        </AnimatePresence>
 
-      <AnimatePresence>
-        {activeDossier && (
-          <DossierPanel
-            key={activeDossier}
-            dossier={dossiers[activeDossier]}
-            onClose={() => setActiveDossier(null)}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+        <AnimatePresence>
+          {activeDossier && (
+            <DossierPanel
+              key={activeDossier}
+              dossier={dossiers[activeDossier]}
+              onClose={() => setActiveDossier(null)}
+            />
+          )}
+        </AnimatePresence>
+
+        <AudioToggle />
+      </div>
+    </AudioProvider>
   );
 };
 

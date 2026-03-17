@@ -156,3 +156,9 @@
 .animate-text-pulse {
   animation: text-pulse 2s ease-in-out infinite;
 }
+
+/* Rain drift on window */
+@keyframes rain-drift {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
