@@ -1,8 +1,6 @@
 import { motion } from "framer-motion";
-import studyIsometric from "@/assets/study-isometric.jpg";
 import studyLofi from "@/assets/study-lofi.jpg";
 import { DossierKey } from "@/pages/Index";
-import { Monitor, Grid3x3, Radio, BookOpen, Trophy, Coffee } from "lucide-react";
 
 interface StudySceneProps {
   onIMacClick: () => void;
@@ -12,36 +10,45 @@ interface StudySceneProps {
   onFlatlandiaClick: () => void;
 }
 
-const Hotspot = ({
-  children,
+const transition15 = { duration: 1.5, ease: [0.4, 0, 0.2, 1] as const };
+
+/* Invisible hotspot mapped to image coordinates (percentage-based) */
+const ImageHotspot = ({
   onClick,
   label,
-  className,
+  style,
 }: {
-  children: React.ReactNode;
   onClick: () => void;
   label: string;
-  className?: string;
+  style: React.CSSProperties;
 }) => (
   <motion.button
     onClick={onClick}
-    className={`absolute group cursor-pointer flex flex-col items-center justify-center gap-1 ${className}`}
-    whileHover={{ scale: 1.05 }}
+    className="absolute cursor-pointer group"
+    style={style}
+    whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
-    transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+    transition={{ duration: 0.3 }}
     aria-label={label}
   >
-    {children}
-    <span className="font-display text-xs text-primary-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/80 px-2 py-0.5 rounded-sm backdrop-blur-sm">
+    {/* Glow overlay on hover */}
+    <div className="absolute inset-0 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+      style={{
+        background: "radial-gradient(ellipse at center, hsl(43 46% 48% / 0.15) 0%, transparent 70%)",
+        boxShadow: "inset 0 0 20px hsl(43 46% 48% / 0.1)",
+      }}
+    />
+    {/* Label tooltip */}
+    <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap font-display text-[11px] text-primary-foreground/90 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/80 px-2 py-0.5 rounded-sm backdrop-blur-sm pointer-events-none">
       {label}
     </span>
   </motion.button>
 );
 
 /* Steam wisps */
-const SteamWisp = ({ delay }: { delay: string }) => (
-  <div
-    className={`absolute w-1 h-6 bg-primary-foreground/20 rounded-full ${delay === "0" ? "animate-steam" : delay === "1" ? "animate-steam-delayed" : "animate-steam-slow"}`}
+const SteamWisp = ({ className }: { className: string }) => (
+  <div className={`absolute w-[2px] h-5 rounded-full ${className}`}
+    style={{ background: "hsl(48 100% 93% / 0.25)" }}
   />
 );
 
@@ -57,145 +64,147 @@ export const StudyScene = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+      transition={transition15}
       className="relative w-full h-full"
     >
-      {/* Background layers - two study images blended */}
+      {/* Background image - the study */}
       <div className="absolute inset-0">
         <img
           src={studyLofi}
-          alt="Studio a Bologna"
+          alt="Studio a Bologna — vista su San Luca"
           className="absolute inset-0 w-full h-full object-cover"
+          draggable={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-background/20" />
+        {/* Warm lamp glow on desk area */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(ellipse 35% 30% at 58% 55%, hsl(43 80% 65% / 0.08) 0%, transparent 100%),
+              radial-gradient(ellipse 20% 25% at 50% 35%, hsl(43 60% 70% / 0.06) 0%, transparent 100%)
+            `,
+          }}
+        />
+        {/* Vignette */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at center, transparent 35%, hsl(25 32% 10% / 0.35) 100%)",
+          }}
+        />
       </div>
 
-      {/* Vignette overlay */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: "radial-gradient(ellipse at center, transparent 40%, hsl(var(--wood-walnut) / 0.3) 100%)"
-      }} />
+      {/* ====== HOTSPOTS mapped to lofi study image ====== */}
+      {/* The lofi image: desk centered, bookshelves L+R, window center-top, lamp right of desk */}
 
-      {/* Interactive hotspots layer */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative w-full max-w-5xl aspect-square max-h-[90vh]">
+      {/* iMac screen — center of desk, slightly right */}
+      <ImageHotspot
+        onClick={onIMacClick}
+        label="iMac 24″ — Technical Mastery & CV"
+        style={{ top: "38%", left: "43%", width: "14%", height: "18%" }}
+      />
 
-          {/* iMac - center of desk */}
-          <Hotspot
-            onClick={onIMacClick}
-            label="Technical Mastery & CV"
-            className="top-[32%] left-[45%] w-28 h-24"
-          >
-            <div className="w-20 h-14 rounded-sm bg-os-green/90 shadow-tactile flex items-center justify-center border border-brass/20">
-              <Monitor className="w-8 h-8 text-primary-foreground/80" />
-            </div>
-          </Hotspot>
+      {/* Desk lamp — right side, above desk surface */}
+      <div className="absolute pointer-events-none" style={{ top: "32%", left: "62%", width: "6%", height: "22%" }}>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-1/3 rounded-full opacity-30"
+          style={{ background: "radial-gradient(ellipse, hsl(43 80% 65% / 0.4) 0%, transparent 70%)" }}
+        />
+      </div>
 
-          {/* Sudoku - right of desk */}
-          <Hotspot
-            onClick={onSudokuClick}
-            label={sudokuSolved ? "Sudoku risolto ✓" : "Solve to unlock Flatlandia"}
-            className="top-[45%] right-[22%] w-20 h-20"
-          >
-            <div className="w-14 h-14 rounded-sm bg-parchment/90 shadow-tactile flex items-center justify-center border border-brass/20">
-              <Grid3x3 className="w-7 h-7 text-foreground/70" />
-            </div>
-          </Hotspot>
+      {/* Sudoku / notebook area — on desk, left-center */}
+      <ImageHotspot
+        onClick={onSudokuClick}
+        label={sudokuSolved ? "Sudoku risolto ✓" : "Sudoku — Solve to unlock Flatlandia"}
+        style={{ top: "55%", left: "35%", width: "10%", height: "10%" }}
+      />
 
-          {/* Coffee cup - near Sudoku */}
-          <div className="absolute top-[40%] right-[30%] w-10 h-10 flex items-center justify-center pointer-events-none">
-            <div className="relative">
-              <Coffee className="w-6 h-6 text-foreground/40" />
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1">
-                <SteamWisp delay="0" />
-                <SteamWisp delay="1" />
-                <SteamWisp delay="2" />
-              </div>
-            </div>
-          </div>
+      {/* Open book on desk — center */}
+      <ImageHotspot
+        onClick={() => onDossierClick("campari")}
+        label="Campari Botanical Prints"
+        style={{ top: "52%", left: "47%", width: "10%", height: "9%" }}
+      />
 
-          {/* Radio - left of desk */}
-          <Hotspot
-            onClick={() => {}}
-            label="Ambient: Rain & Jazz"
-            className="top-[45%] left-[18%] w-20 h-16"
-          >
-            <div className="w-14 h-10 rounded-sm bg-walnut/80 shadow-tactile flex items-center justify-center border border-brass/20">
-              <Radio className="w-6 h-6 text-brass" />
-            </div>
-            <span className="font-ui text-[9px] text-brass/70 animate-text-pulse">♪ playing</span>
-          </Hotspot>
-
-          {/* Dossier: Campari - left wall prints */}
-          <Hotspot
-            onClick={() => onDossierClick("campari")}
-            label="Campari Botanical"
-            className="top-[15%] left-[10%] w-16 h-20"
-          >
-            <div className="w-12 h-16 rounded-sm bg-walnut/70 shadow-tactile flex items-center justify-center border border-brass/30">
-              <BookOpen className="w-5 h-5 text-parchment/80" />
-            </div>
-          </Hotspot>
-
-          {/* Dossier: Richemont - left wall, lower */}
-          <Hotspot
-            onClick={() => onDossierClick("richemont")}
-            label="Patek Philippe / Glashütte"
-            className="top-[25%] left-[15%] w-14 h-14"
-          >
-            <div className="w-11 h-11 rounded-sm bg-walnut/60 shadow-tactile flex items-center justify-center border border-brass/30">
-              <span className="font-display text-lg text-brass/80">⚙</span>
-            </div>
-          </Hotspot>
-
-          {/* Dossier: Christie's - right wall */}
-          <Hotspot
-            onClick={() => onDossierClick("christies")}
-            label="Christie's La Dolce Vita"
-            className="top-[15%] right-[10%] w-16 h-20"
-          >
-            <div className="w-12 h-16 rounded-sm bg-leather/60 shadow-tactile flex items-center justify-center border border-brass/20">
-              <BookOpen className="w-5 h-5 text-brass/70" />
-            </div>
-          </Hotspot>
-
-          {/* Dossier: Loyola - right wall, lower */}
-          <Hotspot
-            onClick={() => onDossierClick("loyola")}
-            label="Loyola New Orleans"
-            className="top-[25%] right-[15%] w-14 h-14"
-          >
-            <div className="w-11 h-11 rounded-full bg-parchment/70 shadow-tactile flex items-center justify-center border border-brass/20">
-              <Trophy className="w-5 h-5 text-foreground/60" />
-            </div>
-          </Hotspot>
-
-          {/* Solved Sudoku: link to Flatlandia */}
-          {sudokuSolved && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="absolute bottom-[20%] right-[25%]"
-            >
-              <button
-                onClick={onFlatlandiaClick}
-                className="font-display text-sm text-brass hover:text-foreground transition-colors duration-500 underline underline-offset-4 decoration-brass/40"
-              >
-                Entra in Flatlandia →
-              </button>
-            </motion.div>
-          )}
-
-          {/* Title watermark */}
-          <div className="absolute bottom-[8%] left-1/2 -translate-x-1/2 text-center pointer-events-none">
-            <h1 className="font-display text-2xl md:text-3xl text-foreground/60 tracking-tight">
-              The Sovereign Archive
-            </h1>
-            <p className="font-ui text-[10px] text-muted-foreground/50 mt-1 tracking-widest uppercase">
-              Click the objects to explore
-            </p>
-          </div>
+      {/* Coffee / steam area — right of book, decorative */}
+      <div className="absolute pointer-events-none" style={{ top: "43%", left: "57%", width: "4%", height: "12%" }}>
+        <div className="relative w-full h-full flex justify-center">
+          <SteamWisp className="animate-steam left-[30%]" />
+          <SteamWisp className="animate-steam-delayed left-[50%]" />
+          <SteamWisp className="animate-steam-slow left-[70%]" />
         </div>
+      </div>
+
+      {/* Left bookshelf — top paintings/frames area */}
+      {/* Frame top-left: landscape painting */}
+      <ImageHotspot
+        onClick={() => onDossierClick("richemont")}
+        label="Patek Philippe / Glashütte — Richemont"
+        style={{ top: "8%", left: "5%", width: "12%", height: "14%" }}
+      />
+
+      {/* Frame mid-left: smaller frames */}
+      <ImageHotspot
+        onClick={() => onDossierClick("christies")}
+        label="Christie's — La Dolce Vita"
+        style={{ top: "24%", left: "5%", width: "10%", height: "12%" }}
+      />
+
+      {/* Right bookshelf — top paintings area */}
+      {/* Frame top-right: portrait */}
+      <ImageHotspot
+        onClick={() => onDossierClick("loyola")}
+        label="Loyola New Orleans — Baseball & Storytelling"
+        style={{ top: "8%", right: "5%", width: "12%", height: "14%" }}
+      />
+
+      {/* Right shelf items */}
+      <ImageHotspot
+        onClick={() => onDossierClick("loyola")}
+        label="Loyola New Orleans"
+        style={{ top: "4%", right: "8%", width: "8%", height: "8%" }}
+      />
+
+      {/* Window — San Luca view (non-interactive, just visual anchor) */}
+      <div className="absolute pointer-events-none" style={{ top: "0%", left: "32%", width: "36%", height: "50%" }}>
+        {/* Subtle rain effect overlay */}
+        <div className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `repeating-linear-gradient(
+              100deg,
+              transparent,
+              transparent 98%,
+              hsl(210 30% 70% / 0.3) 98%,
+              hsl(210 30% 70% / 0.3) 100%
+            )`,
+            backgroundSize: "3px 100%",
+            animation: "rain-drift 8s linear infinite",
+          }}
+        />
+      </div>
+
+      {/* Flatlandia link after solving */}
+      {sudokuSolved && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className="absolute bottom-[12%] left-1/2 -translate-x-1/2 z-10"
+        >
+          <button
+            onClick={onFlatlandiaClick}
+            className="font-display text-base text-brass hover:text-foreground transition-colors duration-700 underline underline-offset-4 decoration-brass/40 cursor-pointer"
+          >
+            Entra in Flatlandia →
+          </button>
+        </motion.div>
+      )}
+
+      {/* Title watermark */}
+      <div className="absolute bottom-[4%] left-1/2 -translate-x-1/2 text-center pointer-events-none z-10">
+        <h1 className="font-display text-xl md:text-2xl text-foreground/40 tracking-tight">
+          The Sovereign Archive
+        </h1>
+        <p className="font-ui text-[9px] text-muted-foreground/40 mt-0.5 tracking-[0.2em] uppercase">
+          Explore the objects
+        </p>
       </div>
     </motion.div>
   );
