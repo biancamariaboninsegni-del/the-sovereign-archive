@@ -15,7 +15,7 @@ export const DossierPanel = ({ dossier, onClose }: DossierPanelProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
         className="fixed inset-0 backdrop-focus z-40"
         onClick={onClose}
       />
